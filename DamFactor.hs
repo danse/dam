@@ -31,7 +31,7 @@ partitionEithersSnd ((a, e):rest) =
       onRight c = (l, (a, c):r)
   in either onLeft onRight e
 
-parseDirectory :: Bool -> FilePath -> IO (Maybe [(FilePath, [Dam.Card])])
+parseDirectory :: Bool -> FilePath -> IO [(FilePath, [Dam.Card])]
 parseDirectory verbose path = do
   pathsWithHidden <- listDirectory path
   let hidden ('.':_) = True
@@ -41,10 +41,10 @@ parseDirectory verbose path = do
   results <- mapM d paths
   let (l, r) = partitionEithersSnd $ zip paths results
   if null l
-    then pure $ Just r
+    then pure r
     else do
       putStrLn "errors parsing files, canceling"
-      pure Nothing
+      pure []
 
 hasTag :: String -> [(Tags, b)] -> [(Tags, b)]
 hasTag t = filter (elem t . fst)
@@ -68,4 +68,4 @@ tagsByLength f = reverse $ sortOn snd $ zip a $ tagLength f <$> a
 parseDirectoryTagsOrEmpty d = do
   setCurrentDirectory d
   c <- parseDirectory True "."
-  pure $ damToFactor <$> fromMaybe [] c
+  pure $ damToFactor <$> c

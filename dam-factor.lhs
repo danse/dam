@@ -117,7 +117,6 @@ main = do
         factoredContents = factor factorContents
       when verbose (print factorContents)
       writeDirectory outputDir factoredContents
-    bail = putStrLn "errors reading the input directory, bailing"
-  maybe bail factorAndWrite c
+  factorAndWrite c
 
 \end{code}
