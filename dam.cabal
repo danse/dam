@@ -1,0 +1,113 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 1c96714c835b83db4186324994344c6828b9faea9c668bf5f8306a1a5d90acfd
+
+name:           dam
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/dam#readme>
+homepage:       https://github.com/githubuser/dam#readme
+bug-reports:    https://github.com/githubuser/dam/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2020 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/dam
+
+library
+  exposed-modules:     Dam
+  build-depends:       base,
+                       parsec
+  default-language:    Haskell2010
+
+library
+  exposed-modules:     DamFactor
+  build-depends:       base,
+                       parsec,
+                       containers,
+                       text,
+                       directory
+  other-modules: Dam
+  default-language:    Haskell2010
+
+executable dam-read
+  main-is:             dam-read.hs
+  build-depends:       base,
+                       parsec,
+                       directory,
+                       transformers,
+                       filemanip
+  other-modules:       Dam
+  default-language:    Haskell2010
+
+executable dam-length
+  main-is:             dam-length.hs
+  build-depends:       base,
+                       parsec,
+                       directory,
+                       transformers,
+                       filemanip
+  other-modules:       Dam
+  default-language:    Haskell2010
+
+executable dam-profile
+  main-is:             dam-profile.hs
+  build-depends:       base, parsec
+  other-modules:       Dam
+  default-language:    Haskell2010
+
+executable dam-slope
+  main-is:             dam-slope.hs
+  build-depends:       base, parsec
+  other-modules:       Dam
+  default-language:    Haskell2010
+
+executable dam-sediment
+  main-is:             dam-sediment.hs
+  build-depends:       base, parsec
+  other-modules:       Dam
+  default-language:    Haskell2010
+
+executable dam-reverse
+  main-is:             dam-reverse.hs
+  build-depends:       base, parsec
+  other-modules:       Dam
+  default-language:    Haskell2010
+
+executable dam-dispatch
+  main-is:             dam-dispatch.hs
+  build-depends:       base,
+                       containers,
+                       safe,
+                       directory,
+                       dam,
+                       parsec,
+                       strict
+  other-modules:       Dam
+  default-language:    Haskell2010
+
+executable dam-factor
+  main-is:             dam-factor.lhs
+  build-depends:       base,
+                       containers,
+                       safe,
+                       directory,
+                       parsec,
+                       dam,
+                       text,
+                       filepath,
+                       microlens
+  other-modules:       Dam,
+                       DamFactor
+  default-language:    Haskell2010
