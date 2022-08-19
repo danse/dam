@@ -37,7 +37,8 @@ library
                        parsec,
                        containers,
                        text,
-                       directory
+                       directory,
+                       microlens
   other-modules: Dam
   default-language:    Haskell2010
 
