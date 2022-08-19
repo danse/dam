@@ -113,6 +113,21 @@ executable dam-factor
                        DamFactor
   default-language:    Haskell2010
 
+executable dam-set-sizes
+  main-is:             dam-set-sizes.lhs
+  build-depends:       base,
+                       containers,
+                       safe,
+                       directory,
+                       parsec,
+                       dam,
+                       text,
+                       filepath,
+                       microlens
+  other-modules:       Dam,
+                       DamFactor
+  default-language:    Haskell2010
+
 executable dam-aeson
   main-is:             dam-aeson.lhs
   build-depends:       base,

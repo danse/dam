@@ -14,8 +14,9 @@ import qualified Data.Text as Text
 import Dam
 import Lens.Micro
 
+type Tag     = String
 type Content = Text.Text
-type Tags    = Set.Set String
+type Tags    = Set.Set Tag
 
 cardToText :: Dam.Card -> Text.Text
 cardToText = Text.unlines . fmap (Text.pack . Dam.getExpression) . Dam.getCard
