@@ -1,6 +1,6 @@
 
 import qualified Data.List as List
-import qualified Dam as Dam
+import qualified Dam
 
 import Dam (Card)
 import Control.Exception (try)
@@ -34,10 +34,10 @@ selectMultiple options selected =
   let
     fromOptions :: String -> Maybe String
     fromOptions s = readMaybe s >>= atMay options
-    selection s = maybe s id (fromOptions s)
+    selection s = fromMaybe s (fromOptions s)
     continue s = selectMultiple (List.delete s options) (s:selected)
   in do
-    putStrLn (show (zip [0..] options :: [(Int, String)]))
+    print (zip [0..] options :: [(Int, String)])
     putStrLn (List.intercalate " < " (reverse selected))
     userLine <- try getLine :: IO (Either IOError String)
     case userLine of
@@ -56,7 +56,7 @@ fileShowCard p = do
 
 fileAppendCard :: NonEmpty String -> Card -> IO ()
 fileAppendCard selection card =
-  let path = List.intercalate " " (toList selection)
+  let path = unwords (toList selection)
   in appendFile path (Dam.showPadded card)
 
 dispatch :: FilePath -> IO Int

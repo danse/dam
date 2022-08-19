@@ -6,13 +6,12 @@ import Data.List
 import Control.Monad
 import Data.Either
 
-import Control.Monad (join, liftM)
 import Data.Foldable (fold)
 
-data Expression = Expression { getExpression :: String } deriving (Eq, Show)
-data Card       = Card       { getCard :: [Expression] } deriving (Eq, Show)
+newtype Expression = Expression { getExpression :: String } deriving (Eq, Show)
+newtype Card       = Card       { getCard :: [Expression] } deriving (Eq, Show)
 
-sep :: [Char]
+sep :: String
 sep = "\n"
 
 showCard :: Card -> String
@@ -22,7 +21,7 @@ showPadded :: Card -> String
 showPadded c = sep <> sep <> showCard c <> sep <> sep
 
 showCards :: [Card] -> String
-showCards n = (intercalate (sep ++ sep) $ map showCard n) ++ sep
+showCards n = intercalate (sep ++ sep) (map showCard n) ++ sep
 
 cardSizeChars :: Card -> Int
 cardSizeChars (Card e) = length (filter (/=' ') (join (map getExpression e)))
@@ -39,23 +38,23 @@ addExpressions :: Card -> [Expression] -> Card
 addExpressions (Card e1) e2 = Card (e1 ++ e2)
 
 countExpressions :: [Card] -> [Card]
-countExpressions n = map c n
+countExpressions = map c
   where c (Card e) = Card [Expression $ show $ length e]
 
 line :: Stream s m Char => ParsecT s u m Expression
-line = liftM Expression $ many1 $ noneOf sep
+line = fmap Expression $ many1 $ noneOf sep
 
 card :: Stream s m Char => ParsecT s u m Card
-card = liftM Card $ line `endBy` (string sep)
+card = fmap Card $ line `endBy` string sep
 
 deck :: Stream s m Char => ParsecT s u m [Card]
-deck = card `sepBy` (many1 (string sep))
+deck = card `sepBy` many1 (string sep)
 
 parseDeck :: String -> String -> Either ParseError [Card]
 parseDeck = parse deck
 
 deckFromFile :: FilePath -> IO (Either ParseError [Card])
-deckFromFile path = readFile path >>= pure . parseDeck path
+deckFromFile path = parseDeck path <$> readFile path
 
 deckFromFileWithReport :: FilePath -> IO (Either ParseError [Card])
 deckFromFileWithReport p = do

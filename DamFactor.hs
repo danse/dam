@@ -6,6 +6,7 @@ import Data.List (groupBy, sortBy, sortOn)
 import Data.Maybe (fromMaybe)
 import System.Directory (listDirectory, setCurrentDirectory)
 
+import qualified Data.Ord
 import qualified Data.Map.Lazy as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
@@ -61,10 +62,10 @@ tagLength :: [(Tags, [b])] -> String -> Int
 tagLength = flip (\ t -> contentLength . hasTag t)
 
 contentLength :: [(a, [b])] -> Int
-contentLength t = sum $ (length . snd) <$> t
+contentLength t = sum $ length . snd <$> t
 
 tagsByLength :: [(Tags, [b])] -> [(String, Int)]
-tagsByLength f = reverse $ sortOn snd $ zip a $ tagLength f <$> a
+tagsByLength f = sortOn (Data.Ord.Down . snd) (zip a $ tagLength f <$> a)
   where a = Set.toList $ allTags f
 
 parseDirectoryTagsOrEmpty d = do

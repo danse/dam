@@ -51,7 +51,7 @@ Then we want some functions to read and write directories
 
 writeDirectory :: FilePath -> [(Tags, [Content])] -> IO ()
 writeDirectory dirPath =
-  let textToFile' tags = textToFile (dirPath </> (tagsToPath tags))
+  let textToFile' tags = textToFile (dirPath </> tagsToPath tags)
   in mapM_ (uncurry textToFile')
 
 main = do

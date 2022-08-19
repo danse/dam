@@ -2,4 +2,4 @@ import Dam
 
 main = do
   contents <- getContents
-  putStr ((onParsed countExpressions) contents)
+  putStr (onParsed countExpressions contents)

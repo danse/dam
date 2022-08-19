@@ -7,4 +7,4 @@ maybeReverse _      = id
 main = do
   args <- getArgs
   contents <- getContents
-  putStr ((onParsed (maybeReverse args . sortBySizeChars)) contents)
+  putStr (onParsed (maybeReverse args . sortBySizeChars) contents)

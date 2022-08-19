@@ -4,4 +4,4 @@ profile = countExpressions . sortBySizeChars
 
 main = do
   contents <- getContents
-  putStr ((onParsed profile) contents)
+  putStr (onParsed profile contents)
