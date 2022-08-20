@@ -51,9 +51,11 @@ Input/Output and main
 
 \begin{code}
 
+rowFormat (tag, int) = show int <> ", " <> tag
+
 main = do
   contents <- fmap damToFactor <$> parseDirectory False "."
   let counts = setSizes contents
-  mapM print (Map.toList counts)
+  mapM (putStrLn . rowFormat) (Map.toList counts)
 
 \end{code}
