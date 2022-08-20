@@ -61,24 +61,24 @@ fileAppendCard selection card =
 
 dispatch :: FilePath -> IO Int
 dispatch path = do
-  maybeDam <- fileShowCard path
-  case maybeDam of
-    Nothing -> do
+  parsed <- fileShowCard path
+  maybe noCards dispatchToNewDeck parsed
+  where
+    noCards = do
       putStrLn ("no cards found in " ++ path)
       return 0
-    Just (card, newDeck) -> do
+    dispatchToNewDeck (card, newDeck) = do
       putStrLn (Dam.showCard card)
       tags <- readTags
-      maybeSelection <- selectMultiple tags []
-      case maybeSelection of
-        Nothing -> return 0
-        Just selection -> do
-          let maybeNonEmptySelection = nonEmpty selection
-              nonEmptySelection = fromMaybe (pure path) maybeNonEmptySelection
-          writeFile path (Dam.showCards newDeck)
-          fileAppendCard nonEmptySelection card
-          p <- dispatch path
-          return (1 + p)
+      selection <- selectMultiple tags []
+      maybe (return 0) (dispatchRepeat card newDeck) selection
+    dispatchRepeat card newDeck selection = do
+      let maybeNonEmptySelection = nonEmpty selection
+          nonEmptySelection = fromMaybe (pure path) maybeNonEmptySelection
+      writeFile path (Dam.showCards newDeck)
+      fileAppendCard nonEmptySelection card
+      p <- dispatch path
+      return (1 + p)
 
 main :: IO ()
 main = do
