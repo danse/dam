@@ -31,14 +31,15 @@ library
                        parsec
   default-language:    Haskell2010
 
-library
+library DamFactor
   exposed-modules:     DamFactor
   build-depends:       base,
                        parsec,
                        containers,
                        text,
                        directory,
-                       microlens
+                       microlens,
+                       hypergraph
   other-modules: Dam
   default-language:    Haskell2010
 
@@ -108,7 +109,8 @@ executable dam-factor
                        dam,
                        text,
                        filepath,
-                       microlens
+                       microlens,
+                       hypergraph
   other-modules:       Dam,
                        DamFactor
   default-language:    Haskell2010
@@ -123,7 +125,8 @@ executable dam-set-sizes
                        dam,
                        text,
                        filepath,
-                       microlens
+                       microlens,
+                       hypergraph
   other-modules:       Dam,
                        DamFactor
   default-language:    Haskell2010
@@ -140,7 +143,8 @@ executable dam-aeson
                        filepath,
                        microlens,
                        aeson,
-                       bytestring
+                       bytestring,
+                       hypergraph
   other-modules:       Dam,
                        DamFactor
   default-language:    Haskell2010

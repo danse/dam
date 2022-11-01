@@ -9,6 +9,7 @@ import Control.Monad (when)
 import Data.Either (lefts, rights)
 import Data.Function ((&))
 import Data.List (groupBy, sortBy, sortOn)
+import Data.Set (Set)
 import Data.Text (Text)
 import System.Environment (getArgs)
 import System.FilePath.Posix ((</>))
@@ -40,7 +41,7 @@ Every content is unique and can point to multiple tags like in a dictionary.
 
 \begin{code}
 
-tagsToPath :: Tags -> FilePath
+tagsToPath :: Set Tag -> FilePath
 tagsToPath = Prelude.unwords . Set.toList
 
 \end{code}
@@ -49,9 +50,10 @@ Then we want some functions to read and write directories
 
 \begin{code}
 
-writeDirectory :: FilePath -> [(Tags, [Content])] -> IO ()
+writeDirectory :: FilePath -> [(Set Tag, Set Content)] -> IO ()
 writeDirectory dirPath =
-  let textToFile' tags = textToFile (dirPath </> tagsToPath tags)
+  let textToFile' tags =
+        textToFile (dirPath </> tagsToPath tags) . Set.toList
   in mapM_ (uncurry textToFile')
 
 main = do
@@ -62,7 +64,7 @@ main = do
     factorAndWrite :: [(FilePath, [Dam.Card])] -> IO ()
     factorAndWrite contents = do
       let
-        factorContents = damToFactor <$> contents
+        factorContents = damToTagged contents
         factoredContents = factor factorContents
       when verbose (print factorContents)
       writeDirectory outputDir factoredContents

@@ -4,6 +4,7 @@ module DamFactor where
 import Data.Foldable (fold)
 import Data.List (groupBy, sortBy, sortOn)
 import Data.Maybe (fromMaybe)
+import Data.Set (Set)
 import System.Directory (listDirectory, setCurrentDirectory)
 
 import qualified Data.Ord
@@ -12,20 +13,27 @@ import qualified Data.Set as Set
 import qualified Data.Text as Text
 
 import Dam
+import Data.Hypergraph
 import Lens.Micro
 
-type Tag     = String
 type Content = Text.Text
-type Tags    = Set.Set Tag
+type Tag = String
+type Tagged = Hypergraph Tag
 
 cardToText :: Dam.Card -> Text.Text
 cardToText = Text.unlines . fmap (Text.pack . Dam.getExpression) . Dam.getCard
 
-pathToTags :: FilePath -> Tags
+pathToTags :: FilePath -> Set Tag
 pathToTags = Set.fromList . Prelude.words
 
-damToFactor :: (FilePath, [Dam.Card]) -> (Tags, [Content])
-damToFactor (p, cc) = (pathToTags p, cardToText <$> cc)
+damToFactor :: (FilePath, [Dam.Card]) -> (Set Tag, Set Content)
+damToFactor (p, cc) = (pathToTags p, Set.fromList $ cardToText <$> cc)
+
+damToTagged :: [(FilePath, [Dam.Card])] -> Tagged Content
+damToTagged = Hypergraph . Map.fromList . foldMap toNodes . fmap damToFactor
+  where
+    toNodes :: (Set Tag, Set Content) -> [(Content, Set Tag)]
+    toNodes (tags, contents) = zip (Set.toList contents) (repeat tags)
 
 partitionEithersSnd :: [(a, Either b c)] -> ([(a, b)], [(a, c)])
 partitionEithersSnd [] = ([], [])
@@ -50,22 +58,22 @@ parseDirectory verbose path = do
       putStrLn "errors parsing files, canceling"
       pure []
 
-hasTag :: String -> [(Tags, b)] -> [(Tags, b)]
+hasTag :: String -> [(Set Tag, b)] -> [(Set Tag, b)]
 hasTag t = filter (elem t . fst)
 
-allTags :: [(Tags, b)] -> Tags
+allTags :: [(Set Tag, b)] -> Set Tag
 allTags f = fold $ fst <$> f
 
-tagGroupLength :: [(Tags, b)] -> String -> Int
+tagGroupLength :: [(Set Tag, b)] -> String -> Int
 tagGroupLength = flip (\ t -> length . hasTag t)
 
-tagLength :: [(Tags, [b])] -> String -> Int
+tagLength :: [(Set Tag, [b])] -> String -> Int
 tagLength = flip (\ t -> contentLength . hasTag t)
 
 contentLength :: [(a, [b])] -> Int
 contentLength t = sum $ length . snd <$> t
 
-tagsByLength :: [(Tags, [b])] -> [(String, Int)]
+tagsByLength :: [(Set Tag, [b])] -> [(String, Int)]
 tagsByLength f = sortOn (Data.Ord.Down . snd) (zip a $ tagLength f <$> a)
   where a = Set.toList $ allTags f
 
@@ -74,55 +82,5 @@ parseDirectoryTagsOrEmpty d = do
   c <- parseDirectory True "."
   pure $ damToFactor <$> c
 
-{-
-
-We want to find the set of tags shared between a set of contents.
-
-In @factor@, first the contents are separated from each other,
-then for every content we collect an union of tags.
-Then we group the different tag sets.
-
--}
-
--- | @g@
--- >>> g [(1, "some"), (2, "strings")]
--- [(1,'s'),(1,'o'),(1,'m'),(1,'e'),(2,'s'),(2,'t'),(2,'r'),(2,'i'),(2,'n'),(2,'g'),(2,'s')]
-g :: [(a, [b])] -> [(a, b)]
-g = concatMap (\(a, bb) -> zip (repeat a) bb)
-
--- | @p@
--- >>> p [(1, 1), (2, 2), (2, 1)]
--- [[(1,1),(2,1)],[(2,2)]]
-p :: (Ord b, Eq b) => [(a, b)] -> [[(a, b)]]
-p = let equalOn a b c = a b == a c
-        compareOn a b c = compare (a b) (a c)
-    in groupBy (equalOn snd) . sortBy (compareOn snd)
-
--- | @byContents@
---
--- >>> :set -XOverloadedStrings
--- >>> p $ g [(Set.fromList ["a"],["a\nb\n","c\n","d\n"]),(Set.fromList ["b"],["a\nb\n","d\n","e\n"])]
--- [[(fromList ["a"],"a\nb\n"),(fromList ["b"],"a\nb\n")],[(fromList ["a"],"c\n")],[(fromList ["a"],"d\n"),(fromList ["b"],"d\n")],[(fromList ["b"],"e\n")]]
--- >>> byContents [(Set.fromList ["a"],["a\nb\n","c\n","d\n"]),(Set.fromList ["b"],["a\nb\n","d\n","e\n"])]
--- [(fromList ["a","b"],"a\nb\n"),(fromList ["a"],"c\n"),(fromList ["a","b"],"d\n"),(fromList ["b"],"e\n")]
-byContents :: [(Tags, [Content])] -> [(Tags, Content)]
-byContents =
-  let
-    concatTags h (a1, b1) (a2, _) = (h a1 a2, b1)
-    f :: (a -> a -> a) ->  [(a, b)] -> (a, b)
-    f h = foldl1 (concatTags h)
-  in fmap (f Set.union) . p . g
-
--- | @factor@
---
--- >>> :set -XOverloadedStrings
--- >>> factor [(Set.fromList ["a"],["a\nb\n","c\n","d\n"]),(Set.fromList ["b"],["a\nb\n","d\n","e\n"])]
--- [(fromList ["a"],["c\n"]),(fromList ["a","b"],["d\n","a\nb\n"]),(fromList ["b"],["e\n"])]
-
-factor :: [(Tags, [Content])] -> [(Tags, [Content])]
-factor =
-  let
-    l :: Applicative c => [(a, b)] -> [(a, c b)]
-    l = fmap (over _2 pure)
-    byTags = Map.fromListWith (<>)
-  in Map.toList . byTags . l . byContents
+factor :: Tagged Content -> [(Set Tag, Set Content)]
+factor = edgeSets
