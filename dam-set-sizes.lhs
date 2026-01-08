@@ -5,12 +5,9 @@ Imports
 
 \begin{code}
 
-import Dam
 import DamFactor
 import Data.Hypergraph
-import Data.List (foldl, nub, sortOn)
-import Data.Set (Set)
-import Data.Text (Text)
+import Data.List (sortOn)
 import Lens.Micro.Extras (view)
 
 import qualified Data.Map as Map
