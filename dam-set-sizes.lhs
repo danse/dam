@@ -8,7 +8,7 @@ Imports
 import Dam
 import DamFactor
 import Data.Hypergraph
-import Data.List (foldl, nub)
+import Data.List (foldl, nub, sortOn)
 import Data.Set (Set)
 import Data.Text (Text)
 import Lens.Micro.Extras (view)
@@ -27,6 +27,6 @@ rowFormat (tag, int) = show int <> ", " <> tag
 main = do
   graph <- damToTagged <$> parseDirectory False "."
   let counts = Set.size <$> view edges graph
-  mapM (putStrLn . rowFormat) (Map.toList counts)
+  mapM (putStrLn . rowFormat) . sortOn snd . Map.toList $ counts
 
 \end{code}
