@@ -95,7 +95,8 @@ executable dam-dispatch
                        directory,
                        dam,
                        parsec,
-                       strict
+                       strict,
+                       seline
   other-modules:       Dam
   default-language:    Haskell2010
 

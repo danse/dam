@@ -13,6 +13,8 @@ import Data.List.NonEmpty (nonEmpty, NonEmpty, toList)
 import Data.Maybe (fromMaybe)
 import System.Environment (getArgs)
 
+import qualified Seline
+
 uniq :: Eq a => [a] -> [a]
 uniq =
   let folding :: Eq a => [a] -> a -> [a]
@@ -29,22 +31,6 @@ readTags = do
         visible "" = False
         visible (c:_) = c /= '.'
 
-selectMultiple :: [String] -> [String] -> IO (Maybe [String])
-selectMultiple options selected =
-  let
-    fromOptions :: String -> Maybe String
-    fromOptions s = readMaybe s >>= atMay options
-    selection s = fromMaybe s (fromOptions s)
-    continue s = selectMultiple (List.delete s options) (s:selected)
-  in do
-    print (zip [0..] options :: [(Int, String)])
-    putStrLn (List.intercalate " < " (reverse selected))
-    userLine <- try getLine :: IO (Either IOError String)
-    case userLine of
-      Left _ -> return Nothing
-      Right "" -> return (Just selected)
-      Right s -> continue (selection s)
-    
 fileShowCard :: FilePath -> IO (Maybe (Card, [Card]))
 fileShowCard p = do
   contents <- readFile p
@@ -70,7 +56,7 @@ dispatch path = do
     dispatchToNewDeck (card, newDeck) = do
       putStrLn (Dam.showCard card)
       tags <- readTags
-      selection <- selectMultiple tags []
+      selection <- Seline.seline Nothing tags []
       maybe (return 0) (dispatchRepeat card newDeck) selection
     dispatchRepeat card newDeck selection = do
       let maybeNonEmptySelection = nonEmpty selection
