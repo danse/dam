@@ -1,6 +1,7 @@
 
 import qualified Data.List as List
 import qualified Dam
+import qualified Seline
 
 import Dam (Card)
 import Control.Exception (try)
@@ -12,8 +13,6 @@ import Data.Function ((&))
 import Data.List.NonEmpty (nonEmpty, NonEmpty, toList)
 import Data.Maybe (fromMaybe)
 import System.Environment (getArgs)
-
-import qualified Seline
 
 readTags :: IO [String]
 readTags = do
