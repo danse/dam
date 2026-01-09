@@ -26,7 +26,7 @@ uniq =
 readTags :: IO [String]
 readTags = do
   paths <- listDirectory "."
-  return (fmap words paths & join & filter visible & uniq & List.sortOn length)
+  return (paths >>= words & filter visible & uniq & List.sortOn length)
   where visible :: String -> Bool
         visible "" = False
         visible (c:_) = c /= '.'
