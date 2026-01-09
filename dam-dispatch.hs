@@ -15,18 +15,10 @@ import System.Environment (getArgs)
 
 import qualified Seline
 
-uniq :: Eq a => [a] -> [a]
-uniq =
-  let folding :: Eq a => [a] -> a -> [a]
-      folding known new
-        | new `elem` known = known
-        | otherwise        = new:known
-  in foldl folding []
-
 readTags :: IO [String]
 readTags = do
   paths <- listDirectory "."
-  return (paths >>= words & filter visible & uniq & List.sortOn length)
+  return (paths >>= words & filter visible & List.nub & List.sortOn length)
   where visible :: String -> Bool
         visible "" = False
         visible (c:_) = c /= '.'
