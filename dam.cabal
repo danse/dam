@@ -43,6 +43,16 @@ library DamFactor
   other-modules: Dam
   default-language:    Haskell2010
 
+executable dam-cycle
+  main-is:             dam-cycle.hs
+  build-depends:       base,
+                       parsec,
+                       directory,
+                       transformers,
+                       filemanip
+  other-modules:       Dam
+  default-language:    Haskell2010
+
 executable dam-read
   main-is:             dam-read.hs
   build-depends:       base,
