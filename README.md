@@ -85,9 +85,6 @@ Requires [Cabal](https://www.haskell.org/cabal/) and GHC 9.4+.
 cabal build
 ```
 
-Dependencies include `hypergraph` (local sdist) and `seline` (fetched from
-git), configured in `cabal.project`.
-
 ## License
 
 BSD3 (see LICENSE).
