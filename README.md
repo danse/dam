@@ -2,9 +2,11 @@
 
 Toolkit for managing structured text files organized as tagged decks of cards.
 
-Part of the [minima](https://github.com/fran/minima) ecosystem — a
-minimalist personal knowledge system combining offline locality with Git-based
-sharing. Files are plain text: no client needed to create or edit them.
+Stemmed from the minima project (see
+[original-design.md](./original-design.md)) — a minimalist personal
+knowledge system combining offline locality with Git-based
+sharing. Files are plain text: no client needed to create or edit
+them.
 
 ## Format
 
