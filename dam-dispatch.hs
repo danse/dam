@@ -14,6 +14,8 @@ import Data.List.NonEmpty (nonEmpty, NonEmpty, toList)
 import Data.Maybe (fromMaybe)
 import System.Environment (getArgs)
 
+import qualified Data.List.NonEmpty as NonEmpty
+
 readTags :: IO [String]
 readTags = do
   paths <- listDirectory "."
@@ -29,7 +31,9 @@ fileShowCard p = do
   where showCard :: String -> Maybe (Card, [Card])
         showCard c = case Dam.parseDeck p c of
           Left _ -> Nothing
-          Right d -> if null d then Nothing else Just (head d, tail d)
+          Right d ->
+            let f l = (NonEmpty.head l, NonEmpty.tail l)
+            in f <$> NonEmpty.nonEmpty d
 
 fileAppendCard :: NonEmpty String -> Card -> IO ()
 fileAppendCard selection card =
